@@ -1,0 +1,19 @@
+
+# Atualiza o sistema e instala as dependências necessárias
+RUN apt-get update && \
+    apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+
+# Importa a chave GPG oficial do Docker
+RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+
+# Adiciona o repositório do Docker às fontes do APT
+RUN echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+# Atualiza os pacotes do sistema operacional
+RUN apt-get update
+
+# Instala o Docker
+RUN apt-get install -y docker-ce docker-ce-cli containerd.io
+
+# Define o comando padrão que será executado ao iniciar um contêiner
+CMD ["bash"]

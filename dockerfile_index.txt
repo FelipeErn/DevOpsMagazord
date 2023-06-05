@@ -1,0 +1,20 @@
+# Use a imagem base do PHP com o Apache
+FROM php:7.4-apache
+
+# Crie um arquivo index.php
+<?php
+echo "Hello, World!";
+?>
+
+# Copie o arquivo index.php para o diretório do site padrão do Apache
+COPY index.php /var/www/html/
+
+# Exponha a porta 80 para acesso externo
+EXPOSE 80
+
+# Comandos para configurar o Apache e iniciar o servidor
+RUN a2enmod rewrite
+RUN service apache2 restart
+
+# Comando para iniciar o Apache quando o contêiner for executado
+CMD ["apache2-foreground"]

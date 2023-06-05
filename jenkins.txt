@@ -1,0 +1,51 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_HOST = 'unix:///var/run/docker.sock'
+    }
+
+    stages {
+        stage('Baixar arquivo PHP') {
+            steps {
+                sh 'aws s3 cp s3://magabucket/index.php .'
+            }
+        }
+
+        stage('Construir container Apache') {
+            steps {
+                sh 'docker build -t meu-container-apache .'
+            }
+        }
+
+        stage('Executar container Apache') {
+            steps {
+                sh 'docker run -d -p 8081:8080 meu-container-apache'
+            }
+        }
+    }
+}
+
+--------------------------------------------------------------------------------/
+
+Para executar o código do pipeline fornecido, você precisará do seguinte:
+
+Plugins: Docker, AWS SDK: ALL, S3 publisher e CloudBees AWS Credentials
+
+Para configurar o ambiente EC2 e o Jenkins para acessar as credenciais da AWS e permitir o acesso a outros aplicativos, você precisará seguir as seguintes etapas:
+
+Configurar as credenciais da AWS:
+
+Na instância EC2, certifique-se de que as credenciais da AWS estejam configuradas corretamente. Isso pode ser feito fornecendo as credenciais por meio de variáveis de ambiente, arquivo de configuração ou usando permissões IAM.
+Verifique se as credenciais possuem permissões suficientes para realizar as operações necessárias, como acessar buckets do Amazon S3 ou executar instâncias do Docker.
+Configurar pontos de acesso e regras de segurança:
+
+No console da AWS, configure as regras de segurança (Security Groups) associadas à instância EC2 para permitir o acesso a partir de outros aplicativos. Isso inclui abrir as portas necessárias para as comunicações do Jenkins com a instância EC2, como SSH ou HTTP/HTTPS.
+Se você estiver usando o serviço Amazon S3, verifique se os buckets estão configurados corretamente e se as permissões estão definidas para permitir o acesso adequado aos arquivos.
+Configurar o Jenkins:
+
+No Jenkins, verifique se as credenciais da AWS estão configuradas corretamente. Isso pode ser feito por meio do painel de administração do Jenkins, acessível através da opção "Gerenciar Jenkins" (Manage Jenkins) no menu lateral.
+Na configuração do Jenkins, você pode adicionar as credenciais da AWS usando o plugin "Amazon Web Services Credentials". Isso permite que o Jenkins acesse recursos da AWS, como buckets do Amazon S3, usando as credenciais corretas.
+Ao seguir essas etapas, você garantirá que o ambiente EC2 tenha as credenciais adequadas configuradas e as regras de segurança corretas para permitir o acesso de outros aplicativos. Além disso, o Jenkins estará configurado com as credenciais da AWS, permitindo que ele acesse recursos da AWS conforme necessário durante a execução do pipeline.
+
+Certifique-se de revisar e ajustar as permissões e as configurações de segurança de acordo com as necessidades do seu ambiente e os princípios recomendados pela AWS para garantir a segurança e a conformidade.
